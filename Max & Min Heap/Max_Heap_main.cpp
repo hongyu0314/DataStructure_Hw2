@@ -90,7 +90,7 @@ int main() {
                 mh.Push(x);
                 std::cout << "已插入 " << x << "\n";
             } else {
-                std::cout << "格式錯誤，請輸入：i X\n";
+                std::cout << "錯誤指令，請輸入：i X\n";
             }
         }
         else if (cmd == 'p') {
@@ -119,7 +119,7 @@ int main() {
             break;
         }
         else {
-            std::cout << "錯誤指令，請用 i/p/t/q。\n";
+            std::cout << "錯誤指令，請用 i /p/t/q。\n";
         }
     }
     return 0;
