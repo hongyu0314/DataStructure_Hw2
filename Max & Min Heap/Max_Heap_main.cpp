@@ -110,7 +110,7 @@ int main() {
             }
         }
         else if (cmd == 'q') {
-            std::cout << "剩餘：\n";
+            std::cout << "剩餘（由大到小）：\n";
             while (!mh.IsEmpty()) {
                 std::cout << mh.Top() << " ";
                 mh.Pop();
