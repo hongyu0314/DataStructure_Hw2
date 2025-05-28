@@ -1,82 +1,90 @@
-
-#include <vector>
+#include <iostream>
 #include <stdexcept>
 #include <algorithm>
-#include <iostream>
+#include <string>
 #include <sstream>
 
 template <class T>
-class MaxPQ {
-public:
-    virtual ~MaxPQ() {}
-    virtual bool IsEmpty() const = 0;
-    virtual const T& Top() const = 0;
-    virtual void Push(const T&) = 0;
-    virtual void Pop() = 0;
-};
+void ChangeSize1D(T*& a, int oldSize, int newSize) {
+    if (newSize < 0) throw std::invalid_argument("new size must be >= 0");
+    T* temp = new T[newSize];
+    int number = std::min(oldSize, newSize);
+    for (int i = 0; i < number; i++)
+        temp[i] = a[i];
+    delete[] a;
+    a = temp;
+}
 
 template <class T>
-class MaxHeap : public MaxPQ<T> {
+class MaxHeap {
 private:
-    std::vector<T> heap;
-
-    void swim(size_t k) { //和父節點比較誰比較大
-        while (k > 0) {
-            size_t parent = (k - 1) / 2;
-            if (heap[parent] < heap[k]) { //比父節點大做交換
-                std::swap(heap[parent], heap[k]);
-                k = parent;
-            }
-            else break;
-        }
-    }
-
-    void sink(size_t k) { //跟子節點比較
-        size_t n = heap.size(); 
-        while (2 * k + 1 < n) {
-            size_t j = 2 * k + 1;       // 左子
-            if (j + 1 < n && heap[j] < heap[j+1]) 
-                j = j + 1;              // 改成較大的右子
-            if (heap[k] < heap[j]) {
-                std::swap(heap[k], heap[j]);
-                k = j;
-            }
-            else break;
-        }
-    }
+    T* heap;          
+    int heapSize;     
+    int capacity;  
 
 public:
-    MaxHeap() = default;
-    virtual ~MaxHeap() {}
-
-    virtual bool IsEmpty() const override {
-        return heap.empty();
+    MaxHeap(int theCapacity = 10) {
+        if (theCapacity < 1) throw std::invalid_argument("Capacity must be >= 1");
+        capacity = theCapacity;
+        heapSize = 0;
+        heap = new T[capacity + 1];
     }
 
-    virtual const T& Top() const override {
-        if (heap.empty()) {
-            throw std::out_of_range("MaxHeap::Top() called on empty heap");
+    ~MaxHeap() {
+        delete[] heap;
+    }
+
+    bool IsEmpty() const {
+        return heapSize == 0;
+    }
+
+    const T& Top() const {
+        if (IsEmpty()) throw std::out_of_range("Heap is empty");
+        return heap[1];
+    }
+
+    void Push(const T& e) {
+        if (heapSize == capacity) {
+            ChangeSize1D(heap, capacity + 1, 2 * capacity + 1);
+            capacity *= 2;
         }
-        return heap[0];
+
+        int currentNode = ++heapSize;
+        while (currentNode != 1 && heap[currentNode / 2] < e) {
+            heap[currentNode] = heap[currentNode / 2];
+            currentNode /= 2;
+        }
+        heap[currentNode] = e;
     }
 
-    virtual void Push(const T& x) override {
-        heap.push_back(x);
-        swim(heap.size() - 1);
-    }
+    void Pop() {
+        if (IsEmpty()) throw std::out_of_range("Heap is empty");
 
-    virtual void Pop() override {
-        if (heap.empty()) return;
-        std::swap(heap[0], heap.back());
-        heap.pop_back();
-        if (!heap.empty()) sink(0);
+        T maxItem = heap[1];
+        T lastItem = heap[heapSize--];
+
+        int parent = 1;
+        int child = 2;
+
+        while (child <= heapSize) {
+            if (child < heapSize && heap[child] < heap[child + 1])
+                child++;
+
+            if (lastItem >= heap[child])
+                break;
+
+            heap[parent] = heap[child];
+            parent = child;
+            child *= 2;
+        }
+        heap[parent] = lastItem;
     }
 };
 
 int main() {
     MaxHeap<double> mh;
     std::string line;
-    std::cout << "指令： i X1 X2 ... Xn（插入多個數值）  p（刪除最大）  t（顯示最大）  q（離開）\n";
+    std::cout << "指令： i X1 X2 ... Xn（插入多個數字）  p（刪除最大）  t（顯示最大）  q（離開）\n";
 
     while (true) {
         std::cout << "> ";
@@ -85,33 +93,31 @@ int main() {
         std::istringstream iss(line);
         char cmd;
         iss >> cmd;
+
         if (cmd == 'i') {
             double x;
-            bool hasInput = false;
+            bool inserted = false;
             while (iss >> x) {
                 mh.Push(x);
                 std::cout << "已插入 " << x << "\n";
-                hasInput = true;
+                inserted = true;
             }
-            if (!hasInput) {
-                std::cout << "錯誤指令，請輸入：i X1 X2 ... Xn\n";
-            }
+            if (!inserted)
+                std::cout << "格式錯誤，請輸入：i X1 X2 ... Xn\n";
         }
         else if (cmd == 'p') {
             if (!mh.IsEmpty()) {
-                double top = mh.Top();
+                std::cout << "已刪除最大根節點 " << mh.Top() << "\n";
                 mh.Pop();
-                std::cout << "已刪除最大節點 " << top << "\n";
             } else {
                 std::cout << "Heap 目前為空，無法刪除。\n";
             }
         }
         else if (cmd == 't') {
-            if (!mh.IsEmpty()) {
-                std::cout << "目前最大節點 = " << mh.Top() << "\n";
-            } else {
+            if (!mh.IsEmpty())
+                std::cout << "目前最大根節點 = " << mh.Top() << "\n";
+            else
                 std::cout << "Heap 目前為空。\n";
-            }
         }
         else if (cmd == 'q') {
             std::cout << "剩餘（由大到小）：\n";
@@ -123,8 +129,9 @@ int main() {
             break;
         }
         else {
-            std::cout << "錯誤指令，請用 i /p/t/q。\n";
+            std::cout << "錯誤指令，請用 i /p /t /q。\n";
         }
     }
+
     return 0;
 }
