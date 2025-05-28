@@ -76,7 +76,7 @@ public:
 int main() {
     MinHeap<double> mh;
     std::string line;
-    std::cout << "指令： i X（插入 X）  p（刪除最小）  t（顯示最小）  q（離開）\n";
+    std::cout << "指令： i X1 X2 ... Xn（插入多個數字）  p（刪除最小）  t（顯示最小）  q（離開）\n";
 
     while (true) {
         std::cout << "> ";
@@ -87,11 +87,14 @@ int main() {
         iss >> cmd;
         if (cmd == 'i') {
             double x;
-            if (iss >> x) {
+            bool hasInput = false;
+            while (iss >> x) {
                 mh.Push(x);
                 std::cout << "已插入 " << x << "\n";
-            } else {
-                std::cout << "錯誤指令，請輸入：i X\n";
+                hasInput = true;
+            }
+            if (!hasInput) {
+                std::cout << "錯誤指令，請輸入：i X1 X2 ... Xn\n";
             }
         }
         else if (cmd == 'p') {
