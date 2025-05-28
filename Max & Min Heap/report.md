@@ -15,6 +15,7 @@
 以下為Max Heap的程式碼：
 
 ```cpp
+
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
@@ -92,7 +93,7 @@ public:
 int main() {
     MaxHeap<double> mh;
     std::string line;
-    std::cout << "指令： i X（插入 X）  p（刪除最大）  t（顯示最大）  q（離開）\n";
+    std::cout << "指令： i X1 X2 ... Xn（插入多個數值）  p（刪除最大）  t（顯示最大）  q（離開）\n";
 
     while (true) {
         std::cout << "> ";
@@ -103,16 +104,19 @@ int main() {
         iss >> cmd;
         if (cmd == 'i') {
             double x;
-            if (iss >> x) {
+            bool hasInput = false;
+            while (iss >> x) {
                 mh.Push(x);
                 std::cout << "已插入 " << x << "\n";
-            } else {
-                std::cout << "錯誤指令，請輸入：i X\n";
+                hasInput = true;
+            }
+            if (!hasInput) {
+                std::cout << "錯誤指令，請輸入：i X1 X2 ... Xn\n";
             }
         }
         else if (cmd == 'p') {
             if (!mh.IsEmpty()) {
-                int top = mh.Top();
+                double top = mh.Top();
                 mh.Pop();
                 std::cout << "已刪除最大節點 " << top << "\n";
             } else {
@@ -277,22 +281,28 @@ int main() {
      
 時間複雜度： $O(n²)$。
  
-空間複雜度： $O(1)$。
+空間複雜度： $O(n)$。
 
 
 ## 測試與驗證
 
 ### 測試案例
+以Max Heap為例：
 
-| 測試案例 | 參數個數 $n$ | Average-case所耗時間 | Worst-case所耗時間 |
-|----------|--------------|----------|----------|
-| 測試一   | $n = 500$      | 262 microseconds | 497 microseconds |
-| 測試二   | $n = 1000$      | 696 microseconds | 1962 microseconds | 
-| 測試三   | $n = 2000$      | 2721 microseconds | 9522 microseconds |
-| 測試四   | $n = 3000$      | 7718 microseconds | 14336 microseconds |
-| 測試五   | $n = 4000$      | 13504 microseconds | 29712 microseconds |
-| 測試六   | $n = 5000$      | 22764 microseconds | 48361 microseconds |
+**i** : 插入數值
 
+**t** : 印出根節點
+
+**p** : 刪除根節點 
+
+**q** : 退出且印出剩餘的數
+
+| 測試案例 | 指令 | 結果 |
+|----------|--------------|----------|
+| 測試一   | i 6 7 8 10 12 14  | 6 7 8 10 12 14 |
+| 測試二   | t  | 14 |
+| 測試三   | p  | 刪除根節點 |
+| 測試四   | q  | 6 7 8 10 12 |
 
 
 ## 申論及開發報告
