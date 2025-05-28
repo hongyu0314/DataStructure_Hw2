@@ -2,45 +2,282 @@
 
 ## 解題說明
 
-本題要求實現一個插入排
+本題要求實現一個 Max/Min Heap。
 
 ### 解題策略
 
-1. Worst-case 的整數變數產生使用 n, n-1, n-2, ...... ,1。
+1. Max（Min） Heap: 插入進來的數值去跟父節點做比較，比父節點大（小）則交換，直到不能交換為止。
 
-2. Average-case 的整數變數產生使用隨機亂數(範圍設在0~9999)。
-
-3. 測量排序時間使用 std::chrono。
+2. 刪除最大（小）節點時把最後一個樹葉節點放到根節點，然後再進行 (1.)的 Heapify。
 
 ## 程式實作
 
 以下為Max Heap的程式碼：
 
 ```cpp
+#include <vector>
+#include <stdexcept>
+#include <algorithm>
+#include <iostream>
+#include <sstream>
 
+template <class T>
+class MaxPQ {
+public:
+    virtual ~MaxPQ() {}
+    virtual bool IsEmpty() const = 0;
+    virtual const T& Top() const = 0;
+    virtual void Push(const T&) = 0;
+    virtual void Pop() = 0;
+};
 
+template <class T>
+class MaxHeap : public MaxPQ<T> {
+private:
+    std::vector<T> heap;
+
+    void swim(size_t k) { //和父節點比較誰比較大
+        while (k > 0) {
+            size_t parent = (k - 1) / 2;
+            if (heap[parent] < heap[k]) { //比父節點大做交換
+                std::swap(heap[parent], heap[k]);
+                k = parent;
+            }
+            else break;
+        }
+    }
+
+    void sink(size_t k) { //跟子節點比較
+        size_t n = heap.size(); 
+        while (2 * k + 1 < n) {
+            size_t j = 2 * k + 1;       // 左子
+            if (j + 1 < n && heap[j] < heap[j+1]) 
+                j = j + 1;              // 改成較大的右子
+            if (heap[k] < heap[j]) {
+                std::swap(heap[k], heap[j]);
+                k = j;
+            }
+            else break;
+        }
+    }
+
+public:
+    MaxHeap() = default;
+    virtual ~MaxHeap() {}
+
+    virtual bool IsEmpty() const override {
+        return heap.empty();
+    }
+
+    virtual const T& Top() const override {
+        if (heap.empty()) {
+            throw std::out_of_range("MaxHeap::Top() called on empty heap");
+        }
+        return heap[0];
+    }
+
+    virtual void Push(const T& x) override {
+        heap.push_back(x);
+        swim(heap.size() - 1);
+    }
+
+    virtual void Pop() override {
+        if (heap.empty()) return;
+        std::swap(heap[0], heap.back());
+        heap.pop_back();
+        if (!heap.empty()) sink(0);
+    }
+};
+
+int main() {
+    MaxHeap<double> mh;
+    std::string line;
+    std::cout << "指令： i X（插入 X）  p（刪除最大）  t（顯示最大）  q（離開）\n";
+
+    while (true) {
+        std::cout << "> ";
+        if (!std::getline(std::cin, line)) break;
+
+        std::istringstream iss(line);
+        char cmd;
+        iss >> cmd;
+        if (cmd == 'i') {
+            double x;
+            if (iss >> x) {
+                mh.Push(x);
+                std::cout << "已插入 " << x << "\n";
+            } else {
+                std::cout << "錯誤指令，請輸入：i X\n";
+            }
+        }
+        else if (cmd == 'p') {
+            if (!mh.IsEmpty()) {
+                int top = mh.Top();
+                mh.Pop();
+                std::cout << "已刪除最大節點 " << top << "\n";
+            } else {
+                std::cout << "Heap 目前為空，無法刪除。\n";
+            }
+        }
+        else if (cmd == 't') {
+            if (!mh.IsEmpty()) {
+                std::cout << "目前最大節點 = " << mh.Top() << "\n";
+            } else {
+                std::cout << "Heap 目前為空。\n";
+            }
+        }
+        else if (cmd == 'q') {
+            std::cout << "剩餘（由大到小）：\n";
+            while (!mh.IsEmpty()) {
+                std::cout << mh.Top() << " ";
+                mh.Pop();
+            }
+            std::cout << "\n";
+            break;
+        }
+        else {
+            std::cout << "錯誤指令，請用 i /p/t/q。\n";
+        }
+    }
+    return 0;
+}
 ```
 以下為Min Heap的程式碼：
 
 ```cpp
+#include <vector>
+#include <stdexcept>
+#include <algorithm>
+#include <iostream>
+#include <sstream>
 
+template <class T>
+class MinPQ {
+public:
+    virtual ~MinPQ() {}
+    virtual bool IsEmpty() const = 0;
+    virtual const T& Top() const = 0;
+    virtual void Push(const T&) = 0;
+    virtual void Pop() = 0;
+};
+
+template <class T>
+class MinHeap : public MinPQ<T> {
+private:
+    std::vector<T> heap;
+
+    
+    void swim(size_t k) { //和父節點比較誰比較小
+        while (k > 0) {
+            size_t parent = (k - 1) / 2;
+            if (heap[parent] > heap[k]) { //比父節點小做交換
+                std::swap(heap[parent], heap[k]);
+                k = parent;
+            }
+            else break;
+        }
+    }
+
+    void sink(size_t k) {
+        size_t n = heap.size();
+        while (2 * k + 1 < n) {
+            size_t j = 2 * k + 1;
+            if (j + 1 < n && heap[j] > heap[j+1])  
+                j = j + 1;
+            if (heap[k] > heap[j]) {  
+                std::swap(heap[k], heap[j]);
+                k = j;
+            }
+            else break;
+        }
+    }
+
+public:
+    MinHeap() = default;
+    virtual ~MinHeap() {}
+
+    virtual bool IsEmpty() const override {
+        return heap.empty();
+    }
+
+    virtual const T& Top() const override {
+        if (heap.empty()) {
+            throw std::out_of_range("MinHeap::Top() called on empty heap");
+        }
+        return heap[0];
+    }
+
+    virtual void Push(const T& x) override {
+        heap.push_back(x);
+        swim(heap.size() - 1);
+    }
+
+    virtual void Pop() override {
+        if (heap.empty()) return;
+        std::swap(heap[0], heap.back());
+        heap.pop_back();
+        if (!heap.empty()) sink(0);
+    }
+};
+
+int main() {
+    MinHeap<double> mh;
+    std::string line;
+    std::cout << "指令： i X（插入 X）  p（刪除最小）  t（顯示最小）  q（離開）\n";
+
+    while (true) {
+        std::cout << "> ";
+        if (!std::getline(std::cin, line)) break;
+
+        std::istringstream iss(line);
+        char cmd;
+        iss >> cmd;
+        if (cmd == 'i') {
+            double x;
+            if (iss >> x) {
+                mh.Push(x);
+                std::cout << "已插入 " << x << "\n";
+            } else {
+                std::cout << "錯誤指令，請輸入：i X\n";
+            }
+        }
+        else if (cmd == 'p') {
+            if (!mh.IsEmpty()) {
+                double top = mh.Top();
+                mh.Pop();
+                std::cout << "已刪除最小節點 " << top << "\n";
+            } else {
+                std::cout << "Heap 目前為空，無法刪除。\n";
+            }
+        }
+        else if (cmd == 't') {
+            if (!mh.IsEmpty()) {
+                std::cout << "目前最小節點 = " << mh.Top() << "\n";
+            } else {
+                std::cout << "Heap 目前為空。\n";
+            }
+        }
+        else if (cmd == 'q') {
+            std::cout << "剩餘節點（由小到大）：\n";
+            while (!mh.IsEmpty()) {
+                std::cout << mh.Top() << " ";
+                mh.Pop();
+            }
+            std::cout << "\n";
+            break;
+        }
+        else {
+            std::cout << "錯誤指令，請用 i/p/t/q。\n";
+        }
+    }
+    return 0;
+}
 ```
 ## 效能分析
-
-1. 
-    Worst-case:
-
-     時間複雜度： $O(n²)$。
+     
+時間複雜度： $O(n²)$。
  
-     空間複雜度： $O(1)$。
-2. 
-   Average-case：
-
-     時間複雜度： $O(n²)$。
- 
-     空間複雜度： $O(1)$。
-
-   **不需要額外的資料結構來存儲中間結果，它只是在原來的陣列上進行操作，因此空間複雜度是 $O(1)$。**
+空間複雜度： $O(1)$。
 
 
 ## 測試與驗證
@@ -62,25 +299,4 @@
 
 ### 在本程式中，使用插入排序法的主要原因如下：
 
-1.  **簡單易懂**
 
-      插入排序的邏輯簡單，容易實作和理解。
-
-
-2. **處理小資料時效率較高**
-
-     對於小型陣列，插入排序表現較好。時間複雜度在最好的情況是 $O(n)$ ，當陣列部分已經排序時，用插入排序時就會很快。
-
-3. **穩定性**
-
-     插入排序是一個穩定的排序方式，當有一樣的東西，排序後它們的順序不會改變。
-
-### 插入排序法的缺點如下：
-
-1. **不適合處理很多的資料**
-
-     由於 $O(n²)$ 的時間複雜度，插入排序在處理很多資訊（例如數十萬或數百萬個資料）時效能會明顯下降，因此對大型資料的處理並不高效。
-
-2. **交換次數多**
-
-     在最壞情況下，插入排序需要大量的交換資料，尤其是在資料完全相反時的情況下。
