@@ -1,4 +1,4 @@
-### 題目問題：What is the total input time for phase two of external sorting if a k-way merge is used with internal memory partitioned into input/output buffers to permit overlap of input, output, and CPU processing as in Buffering (Program 7.21)?
+### 問題（a）： What is the total input time for phase two of external sorting if a k-way merge is used with internal memory partitioned into input/output buffers to permit overlap of input, output, and CPU processing as in Buffering (Program 7.21)?
 
 $n$: 總記錄數
 
@@ -23,3 +23,6 @@ $tt$: transmission time per record
 5. 傳輸n個記錄的時間： $n × tt$ 
 
 答案： $⌈n/(S/k)⌉ × (ts + tl) + n × tt$
+
+
+### 問題（b）： Obtain a rough plot of the total input time, $tinput$ , versus $k$ . Will there always be a value of $k$ for which $tCPU$ approx $tinput$ ?
