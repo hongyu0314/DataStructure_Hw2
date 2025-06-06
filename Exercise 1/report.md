@@ -27,7 +27,7 @@
 
 ### 問題（b）： Obtain a rough plot of the total input time, $tinput$ , versus $k$ . Will there always be a value of $k$ for which $tCPU$ approx $tinput$ ?
 
-#### 課本給的參數
+### 課本給的參數
 
 * $s = 80 ms = 0.08 sec$
 * $tl = 20 ms = 0.02 sec$
