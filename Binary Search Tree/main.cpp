@@ -69,20 +69,20 @@ private: // 輸入和刪除單元的主要程式
 
       return node;
     }
-    
-public:
-    
+
     void deleteTree(Node* node) {
         if (node == nullptr) return;
 
-        // Post-order traversal: delete children first
+        // 向下遞迴刪除
         deleteTree(node->left);
         deleteTree(node->right);
     
         delete node;
     }
+    
+public: // 以下是類別對外的節點編輯方法(method)
 
-    void clear() {
+    void clear() { 
         deleteTree(root);
         root = nullptr;
     }
@@ -92,7 +92,7 @@ public:
     }
     
     int height(Node* root) {
-    if (!root) return -1;
+    if (!root) return -1; // 遞迴找最大高度值
     return 1 + max(height(root->left), height(root->right));
     }
 
@@ -112,7 +112,7 @@ int main() {
         }
         cout << "n = " << n_values[i] << " , height = " << tree.height(tree.root) << " , height / log2() = " \
         << tree.height(tree.root) / log2(n_values[i]) << "\n";
-        tree.clear(); 
+        tree.clear();  // 每次執行後重制樹
     }
     
     return 0;
