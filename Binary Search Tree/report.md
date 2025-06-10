@@ -3,24 +3,19 @@
 
 ## 題目說明
 
-本題要求實做一個 Binary Searching Tree 並加入 n 個節點，輸出要求該搜尋樹的 height/log₂n。
+題 1 要求實做一個 Binary Searching Tree 並加入 n 個節點，輸出要求該搜尋樹的 height/log₂n。
 
-## 程式實作
+題 2 要求 delete key 的函式和效能分析 
 
-以下為 Binary Searching Tree 的程式碼：
+## 測試與驗證
 
-```cpp
+以下為執行結果 正如題目 height/log₂n 結果在 2 左右。
 
-```
+
 
 ## 效能分析
      
-時間複雜度： $O(logn)$。
- 
-空間複雜度： $O(n)$。
-
-
-## 測試與驗證
+時間複雜度(最差)： $O(n)$
 
 ### 測試案例
 以Max Heap為例：
