@@ -11,7 +11,7 @@
 
 以下為執行結果 正如題目 height/log₂n 結果在 2 左右。
 
-
+![image] https://github.com/hongyu0314/DataStructure_Hw2/blob/main/img/BST_execute_outcome.png
 
 ## 效能分析
      
